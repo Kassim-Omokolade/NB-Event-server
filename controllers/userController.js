@@ -81,7 +81,7 @@ const loginUser = async (req, res) => {
 
     //generate token - jwt jsonwebtoken
     const token = generateToken({ userId: user._id, email: user.email });
-    res.status(400).json({
+    res.status(200).json({
       success: true,
       token,
       user: { email: user.email, fullName: user.fullName },
