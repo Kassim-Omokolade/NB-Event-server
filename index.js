@@ -4,10 +4,11 @@ const mongoose = require("mongoose");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const userRouter=require("./routes/userRouter")
+const cors=require("cors")
 
 //MIDDLEWARE
 app.use(express.json());
-
+app.use(cors())
 //routes
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "Mb Events Server" });
