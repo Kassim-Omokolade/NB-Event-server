@@ -1,7 +1,9 @@
 const router = require("express").Router()
 const {createEvent,getUpcomingEvents,getFreeEvents}= require("../controllers/eventController")
 
-router.post("/",createEvent)
+const auth =require("../middleware/auth")
+
+router.post("/",auth,createEvent)
 router.get("/upcoming",getUpcomingEvents)
 router.get("/free", getFreeEvents)
 
