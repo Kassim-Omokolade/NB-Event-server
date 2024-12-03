@@ -5,15 +5,29 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const userRouter=require("./routes/userRouter")
 const cors=require("cors")
+const fileupload =require("express-fileupload")
+const cloudinary= require("cloudinary").v2
+
+
+const eventRouter =require("./routes/eventRouter")
+
+//cloudinary.config
+ cloudinary.config({
+   cloud_name: process.env.CLOUD_NAME,
+   api_key: process.env.API_KEY,
+   api_secret: process.env.API_SECRET, // Click 'View API Keys' above to copy your API secret
+ });
 
 //MIDDLEWARE
-app.use(express.json());
+app.use(fileupload({useTempFiles:true}))//req password
+app.use(express.json());//req body
 app.use(cors())
 //routes
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "Mb Events Server" });
 });
 app.use("/api/v1",userRouter)
+app.use("/api/v1/events", eventRouter)
 
 //db connection
 
