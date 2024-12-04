@@ -33,39 +33,37 @@ const createEvent = async (req, res) => {
     }
 
     //image upload files
-const imageFile = req.files.image.tempFilePath
-//upload image to cloudinary
-const uploadedImage = await cloudinary.uploader.upload(imageFile,{
-    use_filename:true,
-    folder:"mbevents"
+    const imageFile = req.files.image.tempFilePath;
+    //upload image to cloudinary
+    const uploadedImage = await cloudinary.uploader.upload(imageFile, {
+      use_filename: true,
+      folder: "mbevents",
+    });
 
-})
+    //delete the file from our server
+    fs.unlinkSync(req.files.image.tempFilePath);
 
-//delete the file from our server
-fs.unlinkSync(req.files.image.tempFilePath);
+    //create a new event
+    const newEvent = new EVENT({
+      image: uploadedImage.secure_url,
+      title,
+      date,
+      startTime,
+      endTime,
+      description,
+      category,
+      location: online === "true" ? "online" : location,
+      tags: Array.isArray(tags) ? tags : tags.split(","),
+      price: {
+        free: free === "true",
+        regular: free === "true" ? 0 : req.body?.regularPrice,
+        vip: free === "true" ? 0 : req.body?.vipPrice,
+      },
+      hostedBy: userId,
+    });
 
-//create a new event
-const newEvent = new EVENT({
-  image: uploadedImage.secure_url,
-  title,
-  date,
-  startTime,
-  endTime,
-  description,
-  category,
-  location: online === "true" ? "online" : location,
-  tags,
-  price: {
-    free: free === "true",
-    regular: free === "true" ? 0 : req.body?.regularPrice,
-    vip: free === "true" ? 0 : req.body?.vipPrice,
-  },
-  hostedBy: userId,
-});
-
-const event =await newEvent.save()
-res.status(201).json({success:true,event})
-
+    const event = await newEvent.save();
+    res.status(201).json({ success: true, event });
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: error.message });
@@ -73,22 +71,42 @@ res.status(201).json({success:true,event})
 };
 
 const getUpcomingEvents = async (req, res) => {
- try {
-    const currentDate = new Date()
-    const upcomingEvents=await Event.find({date: {$gte: currentDate}})
-    .sort("date")//sort by date in asceding order
-    .limit(4); //limit the no of event to 4
+  try {
+    const currentDate = new Date();
+    const upcomingEvents = await EVENT.find({ date: { $gte: currentDate } })
+      .sort("date") //sort by date in asceding order
+      .limit(4); //limit the no of event to 4
 
-    res.status(200).json({ success: true, events:upcomingEvents });
- } catch (error) {
-     res
-       .status(400)
-       .json({ message: error.message });
- }
+    res.status(200).json({ success: true, events: upcomingEvents });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };
 
 const getFreeEvents = async (req, res) => {
-  res.send("get free dvents");
+  try {
+    const currentDate = new Date();
+    const freeEvents = await EVENT.find({
+      date: { $gte: currentDate },
+      "price.free": true,
+    })
+      .sort("date")
+      .limit(6)
+      .populate("hostedBy", "fullName");
+
+    res.status(200).json({ success: true, events: freeEvents });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };
 
-module.exports = { createEvent, getUpcomingEvents, getFreeEvents };
+const getSingleEvents = async (req, res) => {
+  res.send("get single event");
+};
+
+module.exports = {
+  createEvent,
+  getUpcomingEvents,
+  getFreeEvents,
+  getSingleEvents,
+};
