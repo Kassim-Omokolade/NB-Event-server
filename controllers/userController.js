@@ -110,7 +110,7 @@ const forgotPassword = async (req, res) => {
 
   try {
     user.resetToken = resetToken;
-      user.resetTokenExpiry = Date.now() + 15 * 60 * 1000; //15 minutes
+    user.resetTokenExpiry = Date.now() + 15 * 60 * 1000; //15 minutes
     await user.save();
 
     //create reset link for the frontend
@@ -126,61 +126,56 @@ const forgotPassword = async (req, res) => {
       console.log("error sending email", error);
     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: " Password reset link sent to your email",
-        resetToken,
-      });
+    res.status(200).json({
+      success: true,
+      message: " Password reset link sent to your email",
+      resetToken,
+    });
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: "something went wrong",
-        error: error.message,
-      });
+    res.status(400).json({
+      success: false,
+      message: "something went wrong",
+      error: error.message,
+    });
   }
 };
 
 const resetPassword = async (req, res) => {
- const {newPassword,token} = req.body
- if (!token || !newPassword){
-   res.status(200).json({
-     success: true,
-     message: " Provide token and new password",
-     resetToken,
-   });
- }
- //verify the token
- try {
-   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-   //FIND THE USER WITH THE TOKEN
-   const user = await USER.findOne({
-     _id: decoded.id,
-     resetToken: token,
-     // lt lte gt gte eq
-     resetTokenExpiry: { $gt: Date.now() },
-   });
-   if (!user) {
-     return res
-       .status(404)
-       .json({ success: false, message: "Invalid or expired token" });
-   }
-   //update the user password
-   user.password = newPassword;
-   //clear reset token fields
-   user.resetToken = undefined;
-   user.resetTokenExpiry = undefined;
-   await user.save();
-   res
-     .status(200)
-     .json({ success: true, message: "Password has been reset successfully" });
- } catch (error) {
-   res.status(400).json({ success: false, message: error.message });
- }
-
+  const { newPassword, token } = req.body;
+  if (!token || !newPassword) {
+    res.status(200).json({
+      success: true,
+      message: " Provide token and new password",
+      resetToken,
+    });
+  }
+  //verify the token
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    //FIND THE USER WITH THE TOKEN
+    const user = await USER.findOne({
+      _id: decoded.id,
+      resetToken: token,
+      // lt lte gt gte eq
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid or expired token" });
+    }
+    //update the user password
+    user.password = newPassword;
+    //clear reset token fields
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Password has been reset successfully" });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
 };
 
 module.exports = {

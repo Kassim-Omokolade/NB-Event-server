@@ -1,4 +1,4 @@
-const Event = require("../models/events");
+const EVENT = require("../models/events");
 const USER = require("../models/user");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
@@ -35,7 +35,7 @@ const createEvent = async (req, res) => {
     //image upload files
 const imageFile = req.files.image.tempFilePath
 //upload image to cloudinary
-const uploadImage = await cloudinary.uploader.upload(imageFile,{
+const uploadedImage = await cloudinary.uploader.upload(imageFile,{
     use_filename:true,
     folder:"mbevents"
 
