@@ -57,7 +57,8 @@ const newEvent = new EVENT({
   tags,
   price: {
     free: free === "true",
-    regular: free === "true" ? 0 : req.body?.vipPrice,
+    regular: free === "true" ? 0 : req.body?.regularPrice,
+    vip: free === "true" ? 0 : req.body?.vipPrice,
   },
   hostedBy: userId,
 });
