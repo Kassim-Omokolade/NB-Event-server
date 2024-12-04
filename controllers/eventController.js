@@ -73,7 +73,18 @@ res.status(201).json({success:true,event})
 };
 
 const getUpcomingEvents = async (req, res) => {
-  res.send("get upcoming events");
+ try {
+    const currentDate = new DATE()
+    const upcomingEvents=await Event.find({date: {$gte: currentDate}})
+    .sort("date")//sort by date in asceding order
+    .limit(4); //limit the no of event to 4
+
+    res.status(200).json({ success: true, events:upcomingEvents });
+ } catch (error) {
+     res
+       .status(400)
+       .json({ message: error.message });
+ }
 };
 
 const getFreeEvents = async (req, res) => {
