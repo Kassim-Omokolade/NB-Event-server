@@ -18,7 +18,7 @@ router.get("/", getAllEvents);
 router.get("/upcoming", getUpcomingEvents);
 router.get("/free", getFreeEvents);
 router.get("/hosted", auth, getHostedEvents),
-  router.post("/pay/:eventId", auth, payForAnEvent);
+router.post("/pay/:eventId", auth, payForAnEvent);
 router.get("/previous", auth, getpreviousEvents);
 router.get("/attending", auth, getEventsToAttend);
 
